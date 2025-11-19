@@ -5,19 +5,9 @@ import { Users as UsersIcon, Mail, Calendar } from "lucide-react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 
-interface User {
-  id: string;
-  name: string;
-  email: string;
-  role: string;
-  status: string;
-  createdAt: string;
-  accounts: number;
-}
-
 const Users = () => {
   const { toast } = useToast();
-  const [users, setUsers] = useState<User[]>([]);
+  const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {

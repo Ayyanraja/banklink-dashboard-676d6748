@@ -6,29 +6,20 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
-import { Plus, GitBranch, Trash2, Edit, MapPin } from "lucide-react";
+import { Plus, MapPin, Trash2, Edit } from "lucide-react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-
-interface Branch {
-  id: string;
-  name: string;
-  bankName: string;
-  address: string;
-  city: string;
-  phone: string;
-}
 
 const Branches = () => {
   const { toast } = useToast();
-  const [branches, setBranches] = useState<Branch[]>([]);
+  const [branches, setBranches] = useState([]);
   const [loading, setLoading] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
-    bankName: "Chase Bank",
+    bankId: "",
     address: "",
     city: "",
-    phone: ""
+    state: ""
   });
 
   useEffect(() => {
@@ -37,45 +28,30 @@ const Branches = () => {
 
   const fetchBranches = async () => {
     setLoading(true);
+    // Simulate API call
     setTimeout(() => {
       setBranches([
-        { 
-          id: "1", 
-          name: "Main Street Branch", 
-          bankName: "Chase Bank", 
-          address: "123 Main St", 
-          city: "New York",
-          phone: "(555) 123-4567"
-        },
-        { 
-          id: "2", 
-          name: "Downtown Branch", 
-          bankName: "Bank of America", 
-          address: "456 Broadway", 
-          city: "New York",
-          phone: "(555) 234-5678"
-        },
-        { 
-          id: "3", 
-          name: "Central Branch", 
-          bankName: "Wells Fargo", 
-          address: "789 5th Ave", 
-          city: "New York",
-          phone: "(555) 345-6789"
-        }
+        { id: "1", name: "Downtown Branch", bank: "Chase Bank", address: "123 Main St", city: "New York", state: "NY" },
+        { id: "2", name: "Airport Branch", bank: "Bank of America", address: "456 Airport Rd", city: "Los Angeles", state: "CA" },
+        { id: "3", name: "Mall Branch", bank: "Wells Fargo", address: "789 Mall Ave", city: "Chicago", state: "IL" },
+        { id: "4", name: "University Branch", bank: "Citibank", address: "321 Campus Dr", city: "Boston", state: "MA" }
       ]);
       setLoading(false);
     }, 500);
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
 
     setTimeout(() => {
-      const branch: Branch = {
+      const branch = {
         id: String(branches.length + 1),
-        ...formData
+        name: formData.name,
+        bank: "Chase Bank", // In real app, this would be looked up from bankId
+        address: formData.address,
+        city: formData.city,
+        state: formData.state
       };
       setBranches([...branches, branch]);
       toast({
@@ -83,12 +59,12 @@ const Branches = () => {
         description: `${formData.name} has been added successfully.`,
       });
       setDialogOpen(false);
-      setFormData({ name: "", bankName: "Chase Bank", address: "", city: "", phone: "" });
+      setFormData({ name: "", bankId: "", address: "", city: "", state: "" });
       setLoading(false);
     }, 1000);
   };
 
-  const handleDelete = (branchId: string) => {
+  const handleDelete = (branchId) => {
     setBranches(branches.filter(branch => branch.id !== branchId));
     toast({
       title: "Branch deleted",
@@ -115,36 +91,33 @@ const Branches = () => {
             <DialogHeader>
               <DialogTitle>Create New Branch</DialogTitle>
               <DialogDescription>
-                Add a new bank branch to the system
+                Add a new branch location to a bank
               </DialogDescription>
             </DialogHeader>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="bankName">Bank</Label>
-                <Select
-                  value={formData.bankName}
-                  onValueChange={(value) => setFormData({...formData, bankName: value})}
-                >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="Chase Bank">Chase Bank</SelectItem>
-                    <SelectItem value="Bank of America">Bank of America</SelectItem>
-                    <SelectItem value="Wells Fargo">Wells Fargo</SelectItem>
-                    <SelectItem value="Citibank">Citibank</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="space-y-2">
                 <Label htmlFor="name">Branch Name</Label>
                 <Input
                   id="name"
-                  placeholder="e.g., Main Street Branch"
+                  placeholder="e.g., Downtown Branch"
                   value={formData.name}
                   onChange={(e) => setFormData({...formData, name: e.target.value})}
                   required
                 />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="bankId">Bank</Label>
+                <Select value={formData.bankId} onValueChange={(value) => setFormData({...formData, bankId: value})}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select a bank" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="1">Chase Bank</SelectItem>
+                    <SelectItem value="2">Bank of America</SelectItem>
+                    <SelectItem value="3">Wells Fargo</SelectItem>
+                    <SelectItem value="4">Citibank</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
               <div className="space-y-2">
                 <Label htmlFor="address">Address</Label>
@@ -156,25 +129,27 @@ const Branches = () => {
                   required
                 />
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="city">City</Label>
-                <Input
-                  id="city"
-                  placeholder="City name"
-                  value={formData.city}
-                  onChange={(e) => setFormData({...formData, city: e.target.value})}
-                  required
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="phone">Phone</Label>
-                <Input
-                  id="phone"
-                  placeholder="(555) 123-4567"
-                  value={formData.phone}
-                  onChange={(e) => setFormData({...formData, phone: e.target.value})}
-                  required
-                />
+              <div className="grid gap-4 md:grid-cols-2">
+                <div className="space-y-2">
+                  <Label htmlFor="city">City</Label>
+                  <Input
+                    id="city"
+                    placeholder="City"
+                    value={formData.city}
+                    onChange={(e) => setFormData({...formData, city: e.target.value})}
+                    required
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="state">State</Label>
+                  <Input
+                    id="state"
+                    placeholder="State"
+                    value={formData.state}
+                    onChange={(e) => setFormData({...formData, state: e.target.value})}
+                    required
+                  />
+                </div>
               </div>
               <Button type="submit" className="w-full" disabled={loading}>
                 {loading ? "Creating..." : "Create Branch"}
@@ -184,6 +159,7 @@ const Branches = () => {
         </Dialog>
       </div>
 
+      {/* Branches Table */}
       <Card>
         <CardHeader>
           <CardTitle>All Branches</CardTitle>
@@ -195,8 +171,9 @@ const Branches = () => {
               <TableRow>
                 <TableHead>Branch Name</TableHead>
                 <TableHead>Bank</TableHead>
-                <TableHead>Location</TableHead>
-                <TableHead>Phone</TableHead>
+                <TableHead>Address</TableHead>
+                <TableHead>City</TableHead>
+                <TableHead>State</TableHead>
                 <TableHead className="text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
@@ -205,18 +182,14 @@ const Branches = () => {
                 <TableRow key={branch.id}>
                   <TableCell className="font-medium">
                     <div className="flex items-center gap-2">
-                      <GitBranch className="h-4 w-4 text-primary" />
+                      <MapPin className="h-4 w-4 text-primary" />
                       {branch.name}
                     </div>
                   </TableCell>
-                  <TableCell>{branch.bankName}</TableCell>
-                  <TableCell>
-                    <div className="flex items-center gap-1 text-sm">
-                      <MapPin className="h-3 w-3 text-muted-foreground" />
-                      {branch.address}, {branch.city}
-                    </div>
-                  </TableCell>
-                  <TableCell className="text-sm">{branch.phone}</TableCell>
+                  <TableCell>{branch.bank}</TableCell>
+                  <TableCell>{branch.address}</TableCell>
+                  <TableCell>{branch.city}</TableCell>
+                  <TableCell>{branch.state}</TableCell>
                   <TableCell className="text-right">
                     <div className="flex justify-end gap-2">
                       <Button variant="ghost" size="icon">
@@ -239,7 +212,7 @@ const Branches = () => {
 
           {branches.length === 0 && !loading && (
             <div className="flex flex-col items-center justify-center py-12 text-center">
-              <GitBranch className="mb-4 h-12 w-12 text-muted-foreground" />
+              <MapPin className="mb-4 h-12 w-12 text-muted-foreground" />
               <h3 className="mb-2 text-lg font-semibold">No branches yet</h3>
               <p className="text-sm text-muted-foreground">
                 Get started by adding your first branch
