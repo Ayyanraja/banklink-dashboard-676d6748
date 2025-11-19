@@ -15,7 +15,7 @@ const Login = () => {
   const { login } = useAuth();
   const { toast } = useToast();
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
 
@@ -36,7 +36,7 @@ const Login = () => {
     }
   };
 
-  const handleDemoLogin = (role: "admin" | "user") => {
+  const handleDemoLogin = (role) => {
     if (role === "admin") {
       setEmail("admin@bankagg.com");
       setPassword("admin123");

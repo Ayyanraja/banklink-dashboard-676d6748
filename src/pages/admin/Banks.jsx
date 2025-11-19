@@ -8,17 +8,9 @@ import { useToast } from "@/hooks/use-toast";
 import { Plus, Building, Trash2, Edit } from "lucide-react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 
-interface Bank {
-  id: string;
-  name: string;
-  code: string;
-  country: string;
-  branches: number;
-}
-
 const Banks = () => {
   const { toast } = useToast();
-  const [banks, setBanks] = useState<Bank[]>([]);
+  const [banks, setBanks] = useState([]);
   const [loading, setLoading] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [formData, setFormData] = useState({
@@ -45,12 +37,12 @@ const Banks = () => {
     }, 500);
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
 
     setTimeout(() => {
-      const bank: Bank = {
+      const bank = {
         id: String(banks.length + 1),
         name: formData.name,
         code: formData.code,
@@ -68,7 +60,7 @@ const Banks = () => {
     }, 1000);
   };
 
-  const handleDelete = (bankId: string) => {
+  const handleDelete = (bankId) => {
     setBanks(banks.filter(bank => bank.id !== bankId));
     toast({
       title: "Bank deleted",
